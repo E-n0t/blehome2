@@ -12,7 +12,41 @@ void set_calibration(int calibration);
 void MyHomeIOT_BLEClient::setup() {
   this->state_ = MYHOMEIOT_IDLE;
 }
+class Mclh09MqttGateway : public Component {
+ public:
+  // ... ваши существующие методы и поля ...
 
+  // Добавляем метод установки калибровки
+  void set_calibration(int calibration) {
+    calibration_ = calibration;
+    ESP_LOGD("Mclh09MqttGateway", "Calibration set to %d%%", calibration_);
+    // Можно сохранить calibration_ в preferences, если нужно
+  }
+
+ protected:
+  int calibration_ = 0;  // коэффициент калибровки влажности в процентах
+
+  // При обработке данных влажности применяйте calibration_, например:
+  float apply_calibration(float raw_value) {
+    // calibration_ в процентах, например +10% -> 1.1, -5% -> 0.95
+    float factor = 1.0f + (calibration_ / 100.0f);
+    float calibrated = raw_value * factor;
+    // Ограничить в допустимых пределах (0..100%)
+    if (calibrated > 100.0f) calibrated = 100.0f;
+    if (calibrated < 0.0f) calibrated = 0.0f;
+    return calibrated;
+  }
+
+  // В вашем методе обработки данных BLE (примерно report_results или аналог)
+  void report_results(const uint8_t *data, size_t length) {
+    // ... ваш код парсинга данных ...
+    float raw_soil_moisture = ...; // получили сырое значение влажности
+
+    float calibrated_soil_moisture = apply_calibration(raw_soil_moisture);
+
+    // Используйте calibrated_soil_moisture для публикации/сохранения
+  }
+};
 void MyHomeIOT_BLEClient::dump_config() {
   ESP_LOGCONFIG(TAG, "MyHomeIOT BLE Client");
   ESP_LOGCONFIG(TAG, "  MAC address: %s", to_string(this->address_).c_str());
