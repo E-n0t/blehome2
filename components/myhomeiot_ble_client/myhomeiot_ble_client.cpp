@@ -8,11 +8,11 @@ namespace esphome {
 namespace myhomeiot_ble_client {
 
 static const char *const TAG = "myhomeiot_ble_client";
+
 void MyHomeIOT_BLEClient::setup() {
   this->state_ = MYHOMEIOT_IDLE;
 }
 
-};
 void MyHomeIOT_BLEClient::dump_config() {
   ESP_LOGCONFIG(TAG, "MyHomeIOT BLE Client");
   ESP_LOGCONFIG(TAG, "  MAC address: %s", to_string(this->address_).c_str());
