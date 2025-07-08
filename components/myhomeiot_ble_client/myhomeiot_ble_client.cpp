@@ -8,7 +8,7 @@ namespace esphome {
 namespace myhomeiot_ble_client {
 
 static const char *const TAG = "myhomeiot_ble_client";
-
+void set_calibration(int calibration);
 void MyHomeIOT_BLEClient::setup() {
   this->state_ = MYHOMEIOT_IDLE;
 }
